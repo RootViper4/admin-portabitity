@@ -1288,7 +1288,7 @@ const App: React.FC = () => {
                     {/* VALIDATED TRANSFERS */}
                     <hr className="my-8 border-t border-gray-100" />
                     <RequestTableSection
-                      title={`Transferts Validés - Sortants (${op})`}
+                      title={`Transferts Validés - Clients (${op})`}
                       subtitle={`Ces numéros ont été Validés par ${op} et ont quitté son réseau.`}
                       requests={group.validated}
                       isActionRequired={false}
