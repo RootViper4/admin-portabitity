@@ -1341,7 +1341,7 @@ const App: React.FC = () => {
                     <hr className="my-10 border-t-2 border-green-500" />
                     {/* 3. VALIDATED INCOMING (SUCCESSFUL TRANSFERS) */}
                     <RequestTableSection
-                      title="Transferts Validés (Entrants)"
+                      title="Transferts Validés (Clients)"
                       subtitle="Ces numéros ont été Validés par leur fournisseur source et ont rejoint {operator}."
                       requests={categorizedRequests.validatedIncoming}
                       isActionRequired={false}
