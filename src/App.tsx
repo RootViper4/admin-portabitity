@@ -76,7 +76,7 @@ try {
 
 type AdminRole = "SuperAdmin" | "ProviderAdmin" | "Guest";
 type OperatorId = "ORANGE" | "AIRTEL" | "VODACOM" | "AFRICELL";
-type RequestStatus = "PENDING" | "Validated" | "Rejected";
+type RequestStatus = "PENDING" | "Validated" | "Rejected" | "EN ATTENTE" | "ACTION REQUISE";
 
 const OPERATORS: OperatorId[] = ["ORANGE", "AIRTEL", "VODACOM", "AFRICELL"];
 
@@ -660,13 +660,35 @@ const RequestRow: React.FC<{
   const [isProcessing, setIsProcessing] = useState(false);
   const isMounted = useIsMounted(); // Hook de sécurité anti-crash
 
-  const statusClass = {
-    PENDING: isActionRequired
-      ? "bg-red-100 text-red-800"
-      : "bg-yellow-100 text-yellow-800",
-    Validated: "bg-green-100 text-green-800",
-    Rejected: "bg-red-100 text-red-800",
-  }[request.status];
+ const statusClass = (() => {
+   // Handle the special case where PENDING needs to be ACTION REQUISE
+   if (request.status === "PENDING" && isActionRequired) {
+     return "bg-red-100 text-red-800"; // Assuming ACTION REQUISE uses the red style
+   }
+
+   // Use a map for all non-dynamic statuses
+   const statusMap: { [key: string]: string } = {
+     // Note: 'PENDING' will fall through here if not isActionRequired
+     PENDING: "bg-yellow-100 text-yellow-800",
+     Validated: "bg-green-100 text-green-800",
+     Rejected: "bg-red-100 text-red-800",
+
+     // 👈 FIX 1: Add the new statuses (The status map must match all possible string values)
+     "ACTION REQUISE": "bg-red-100 text-red-800", // Using red for required action
+     "EN ATTENTE": "bg-yellow-100 text-yellow-800", // Using yellow for waiting
+
+     // Fallback in case status is missing (optional but recommended)
+     Completed: "bg-green-100 text-green-800", // Assuming you have a 'Completed' status
+     PaymentPending: "bg-blue-100 text-blue-800", // Assuming you have 'PaymentPending'
+   };
+
+   // If request.status is one of the new, non-dynamic states, return its class
+   // If request.status is 'PENDING', it's already handled by the if or the PENDING key above.
+   return (
+     statusMap[request.status as keyof typeof statusMap] ||
+     "bg-gray-100 text-gray-800"
+   );
+ })();
 
   // Logic to determine the display label for the status column
   let statusLabel = request.status;
@@ -1207,15 +1229,17 @@ const App: React.FC = () => {
       )}
 
       {/* SECTION ANALYSE (Visible pour tous les administrateurs) */}
-      {!allDataLoading && !dataError && adminState.role !== "Guest" && (
-        <AnalyticsSection
-          analytics={analytics}
-          loading={allDataLoading}
-          dataAvailable={allRequests.length > 0}
-          role={adminState.role}
-          operatorFilter={adminState.operator}
-        />
-      )}
+      {!allDataLoading &&
+        !dataError &&
+        (adminState.role as any) !== "Guest" && (
+          <AnalyticsSection
+            analytics={analytics}
+            loading={allDataLoading}
+            dataAvailable={allRequests.length > 0}
+            role={adminState.role}
+            operatorFilter={adminState.operator}
+          />
+        )}
 
       <hr className="my-10 border-t-2 border-gray-200" />
 
