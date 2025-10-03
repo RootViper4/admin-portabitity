@@ -332,7 +332,7 @@ const useAllPortabilityRequests = () => {
         (e) => {
           console.error("Erreur onSnapshot (Admin - All Fetch):", e);
           setError(
-            "Erreur de chargement des données d'analyse. Vérifiez les permissions Firestore pour lire la collectionGroup 'portability_requests'."
+            "Erreur de chargement des données d'analyse. Recharger la page"
           );
           setLoading(false);
         }
